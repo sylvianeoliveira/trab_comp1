@@ -7,31 +7,31 @@ int main(void){
     FILE *arquivo, *arquivo2;
     VETORES vetor;
     char c;
-    int i, resposta, vidas, tamanho, intervalo, jogar_novamente, acesso_regras;
-    char nickname[30];
-    /*int acesso_regras = 42; falta arrumar a funcao daqui*/
-    int teste_de_nome = 42;   /*para nao causar problemas com o retorno*/
-    char nivel_do_jogo; 
-    /*system("chcp 65001"); Para windows*/
-    /*setlocale(LC_ALL, "Portuguese"); Para linux*/
+    int resposta, vidas, tamanho, intervalo, jogar_novamente, acesso_regras;
+    char nickname[33];
+    int teste_de_nome;  /*Para nao causar problemas com o retorno*/
+    char nivel_do_jogo;
+
+    acesso_caractere_especial();
 
     printf("Seja muito bem vindo ao Mastermind\n\n"); /*Mensagem de Boas-Vindas*/
 
     /***Solicita o nome do usuario***/
     while(1){
-        printf("Informe seu nome (somente letras e números): \n");
-        fgets(nickname,30,stdin);
+        printf("Informe seu nome (somente letras sem acento e números): \n");
+        fgets(nickname,33,stdin);
+        limpa_buffer();
         limpa_string(nickname);
-        valida_nome(nickname);
-
         teste_de_nome = valida_nome(nickname);
+
         if (teste_de_nome == 1){
             printf("Nome aceito com sucesso.\n\n");
             break;
         }
         printf("Nome inválido\n");
     }
-
+    easteregg(nickname);
+    
     printf("%s, chegou a hora de treinar suas habilidades em quebrar códigos.\n", nickname); /*Saudação para iniciar o jogo*/
     
     while(1){ /*O jogo em loop até o usuário desejar sair*/
@@ -70,39 +70,52 @@ int main(void){
 
         nivel_do_jogo = valida_nivel(); /*Função que valida o nível escolhido pelo usuário e retorna o nível escolhido quando válido*/
 
+        if (nivel_do_jogo == 42){ /*Mensagem para o usuário que acessar o modo desafio*/
+            printf("Parabéns! Você acessou o modo desafio! Neste modo você terá apenas 10 tentativas.\n\n");
+        }
+
         /***Avisos acerca da legenda utilizada no jogo***/
         printf("\n");
         printf("Aviso:\n");
-        printf("Cada 'X' indica a quantidade números digitados por você que estão no codigo e estão na posição correta.\n");
-        printf("Cada 'O' indica a quantidade números digitados por você que estão no codigo, mas na posição errada.\n");
-        printf("\n");
+        printf("Cada 'X' indica um dígito da tentativa que existe na senha e está na posição correta.\n");
+        printf("Cada 'O' indica um dígito da tentativa que existe na senha, mas está na posição errada.\n");
 
         /***Switch para determinar as condições de cada nível***/
         switch (nivel_do_jogo){
         case 1:
-            printf("Senha fácil gerada com sucesso.\n");
             tamanho = 4; /*Tamanho da senha*/
-            vidas = 10; /*Quantidade de tentativas possíveis*/
+            vidas = 8; /*Quantidade de tentativas possíveis*/
             intervalo = 6; /*Opções de digitos: 1 a 6*/
+            printf("No nível fácil, a senha e a tentativa só podem conter números de 1 a %d.\n\n", intervalo);
+            printf("Senha fácil gerada com sucesso.\n");
             break;
 
         case 2:
-            printf("Senha intermediária gerada com sucesso.\n");
             tamanho = 4; /*Tamanho da senha*/
-            vidas = 15; /*Quantidade de tentativas possíveis*/
+            vidas = 10; /*Quantidade de tentativas possíveis*/
             intervalo = 6; /*Opções de digitos: 1 a 6*/
+            printf("No nível intermediário, a senha e a tentativa só podem conter números de 1 a %d.\n\n", intervalo);
+            printf("Senha intermediária gerada com sucesso.\n");
             break;
 
         case 3:
-            printf("Senha difícil gerada com sucesso.\n");
-            printf("Boa sorte %s, vai precisar.\n", nickname); /*Mensagem para usuários*/
             tamanho = 4; /*Tamanho da senha*/
-            vidas = 20; /*Quantidade de tentativas possíveis*/
+            vidas = 15; /*Quantidade de tentativas possíveis*/
             intervalo = 8; /*Opções de digitos: 1 a 8*/
+            printf("No nível difícil, a senha e a tentativa só podem conter números de 1 a %d.\n\n", intervalo);
+            printf("Senha difícil gerada com sucesso.\n");
 
             /*vetor_bolas_branca_e_preta = (char *) realloc(vetor_bolas_branca_e_preta, 6 * sizeof(char));
             vetor_tentativa = (int *) realloc(vetor_tentativa, 6 * sizeof(int)); */
             break;
+        case 42:
+            tamanho = 4; /*Tamanho da senha*/
+            vidas = 10; /*Quantidade de tentativas possíveis*/
+            intervalo = 9; /*Opções de digitos: 1 a 9*/
+            printf("No modo desafio, a senha e a tentativa podem conter números de 1 a %d.\n\n", intervalo);
+            printf("Senha desafio gerada com sucesso.\n");
+            printf("Boa sorte %s, vai precisar.\n", nickname); /*Mensagem para usuários*/
+            break; 
         default:
             break;
         }
@@ -115,11 +128,12 @@ int main(void){
         fclose(arquivo);
 
         /***Solicita ao usuário tentativas de acordo com sua quantidade de vidas***/
-        for(i=0; i < vidas; i++){
-            printf("\nTentativa: %d.\n", i+1);
+        for( ; vidas > 0 ; vidas--){
+            vidas == 1? printf("\nResta %d tentativa.\n", vidas) : printf("\nRestam %d tentativas.\n", vidas);
             while(1){ /*While que verifica se a senha é válida*/
                 printf("Digite uma senha sem espaço entre os digitos: "); /*Pede a tentativa*/
                 fgets(vetor.tentativa, 32, stdin); /*Lê a tentativa*/
+                limpa_buffer();
                 limpa_string(vetor.tentativa); /*Limpa o \n do vetor tentativa*/
                 resposta = valida_tentativa(vetor, intervalo, tamanho); /*Função que valida a senha e retorna 1 ou 0*/
                 if (resposta == 1) break; /*Interrompe o while quando a tentativa é válida*/
@@ -149,7 +163,7 @@ int main(void){
                 printf("Parabéns! Você venceu o jogo!\n");
                 break;
             }
-            else if ((compara_tentativa_senha(vetor, tamanho) == 0) && (i ==  vidas - 1)){ /*Imprime a mensagem de derrota quando acabam as
+            else if ((compara_tentativa_senha(vetor, tamanho) == 0) && (vidas == 1)){ /*Imprime a mensagem de derrota quando acabam as
                                                                                            tentativas e o usuário não acertou a senha*/
                 printf("Derrota! Você perdeu o jogo!\n");
                 /**Informa qual era a senha ao usuário que perdeu**/

@@ -6,6 +6,26 @@
 #include "estruturas.h"
 #include "funcoes.h"
 
+void acesso_caractere_especial(void){
+    #if defined(linux) || defined(unix) || defined(APPLE)
+        setlocale(LC_ALL, "Portuguese");
+    #endif
+ 
+    #if defined(_WIN32) || defined(_WIN64)
+        system("chcp 65001");
+    #endif
+}
+
+void limpa_buffer(void){
+    #if defined(linux) || defined(unix) || defined(APPLE)
+       __fpurge(stdin);
+    #endif
+ 
+    #if defined(_WIN32) || defined(_WIN64)
+       fflush(stdin);
+    #endif
+}
+
 void limpa_string(char string[]) {
     int tam = strlen(string);
     int i;
@@ -27,6 +47,8 @@ int valida_nome(char nickname[]) {
     
     tam = strlen(nickname);
 
+    if(tam > 30)  return 0;
+
     /*aplicação das restrições do nome*/
     for(i = 0; i < tam; i++) {
         if( !( (nickname[i] >= 'A' && nickname[i] <= 'Z') || (nickname[i] >= 'a' && nickname[i] <= 'z') || (nickname[i] >= '0' && nickname[i] <= '9') || nickname[i]==' ') ) {
@@ -42,6 +64,7 @@ int valida_acesso_regras(void) {
     char regras[32];
     while(1){
         fgets(regras, 32, stdin);
+        limpa_buffer();
         limpa_string(regras);
         if (strlen(regras) == 1){
             if (regras[0] != '0' && regras[0] != '1'){
@@ -63,18 +86,13 @@ int valida_nivel(void){
 
     while(1){
         fgets(nivel, 32, stdin);
+        limpa_buffer();
         limpa_string(nivel);
-        if (strlen(nivel) == 1){
-            if (nivel[0] < 49 || nivel[0] > 51){
-                printf("Nível de jogo inválido.\n");
-            }
-            else{
-                break;
-            }
-        }
-        else{
-            printf("Nível de jogo inválido.\n");
-        }
+        if ((strlen(nivel) == 1) && (nivel[0] >= 49 && nivel[0] <= 51)) break;
+
+        else if((strlen(nivel) == 2) && (nivel[0] == '4' && nivel[1] == '2')) return 42;
+
+        else printf("Nível inválido\n");
     }
     return nivel[0] - '0';
 }
@@ -94,6 +112,41 @@ int valida_tentativa (VETORES vetor, int intervalo, int tamanho){
         return 1;
     }
     return 0;
+}
+
+void easteregg(char nickname[]){
+    char world[5] = "world"; /*Vetor de comparação*/
+    char andre[11] = "andre brito"; /*Vetor de comparação*/
+    char valeria[14] = "valeria bastos"; /*Vetor de comparação*/
+    int i, tamanho, validador = 0;
+    tamanho = strlen(nickname);
+
+    for (i=0; i < tamanho; i++){ /*Compara se a string é igual a world*/
+        if ((tamanho == 5) && (nickname[i] == world[i] || nickname[i] == world[i] - 32)) validador = 1;
+        else{
+            validador = 0;
+            break;
+        }
+    }
+    if (validador == 1) printf("Hello ");
+
+    for (i=0; i < tamanho; i++){ /*Compara se a string é igual a 'andre' ou 'andre brito'*/
+        if ((tamanho == 5 || tamanho == 11) && (nickname[i] == andre[i] || nickname[i] == andre[i] - 32)) validador = 1;
+        else{
+            validador = 0;
+            break;
+        }
+    }
+    if (validador == 1) printf("Professor??? :o \n\n");
+
+    for (i=0; i < tamanho; i++){ /*Compara se a strig é igual a 'valeria' ou 'valeria bastos'*/
+        if ((tamanho == 7 || tamanho == 14) && (nickname[i] == valeria[i] || nickname[i] == valeria[i] - 32)) validador = 1;
+        else{
+            validador = 0;
+            break;
+        }
+    }
+    if (validador == 1) printf("Professora??? :o\n\n");  
 }
 
 void gerador_senha(VETORES vetor,int nivel) {/*De acordo com o nivel do jogo ele gera uma senha diferente*/
@@ -118,10 +171,15 @@ void gerador_senha(VETORES vetor,int nivel) {/*De acordo com o nivel do jogo ele
             vetor.senha[i] = 1 + rand() % 5;
         }
     }
-    else if(nivel == 3) {/*Nivel 3 gera uma senha de 4 digitos com repetição*/
+    else if(nivel == 3) {/*Nivel 3 gera uma senha de 4 digitos de 1 a 8 com repetição*/
         /*vetor.senha = (int *) realloc(vetor.senha, 6 * sizeof(int));*/
         for (i=0; i < 4; i++){
             vetor.senha[i] = 1 + rand() % 7;
+        }
+    }
+    else if(nivel == 42){ /*Modo desafio gera uma senha de 4 dígitos de 1 a 9 com repetição*/
+        for (i=0; i < 4; i++){
+            vetor.senha[i] = 1 + rand() % 8;
         }
     }
 }

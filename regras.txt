@@ -1,4 +1,37 @@
-Essas são as regras
-Regra 1
-Regra 2
-Regra 3
+                      REGRAS DO JOGO
+----------------------------------------------------------------
+O objetivo do jogo é tentar descobrir a senha oculta.
+A cada tentativa, será exibido na tela a quantidade de dígitos
+corretos na posição certa e na posição errada.
+
+Cada 'X' indica um dígito da tentativa que existe na senha e
+está na posição correta.
+
+Cada 'O' indica um dígito da tentativa que existe na senha,
+mas está na posição errada.
+
+================================================================
+Importante: A ordem destas informações não corresponde à ordem
+dos digitos.
+================================================================
+
+Exemplo:
+Senha: 4 6 2 2  Tentativa: 6 5 4 2
+
+Tela: 6 5 4 2 || X O O -
+
+----------------------------------------------------------------
++ No nível fácil, o jogador terá 8 tentativas para adivinhar
+uma senha de 4 dígitos entre 1 e 6 sem repetição.
+Exemplo: 1 2 3 4
+
+++ No nível intermediário, o jogador terá 10 tentativas para
+adivinhar uma senha de 4 dígitos entre 1 e 6 com repetição.
+Exemplo: 1 6 2 1
+
++++ No nível difícil, o jogador terá 15 tentativas para adivinhar
+uma senha de 4 dígitos entre 1 e 8 com repetição.
+Exemplo: 7 7 5 3
+
+****Se você procurar direitinho, irá achar algumas surpresas****
+----------------------------------------------------------------
