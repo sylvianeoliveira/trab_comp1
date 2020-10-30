@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <locale.h>
 #include "estruturas.h"
 #include "funcoes.h"
 
@@ -101,26 +102,25 @@ void gerador_senha(VETORES vetor,int nivel) {/*De acordo com o nivel do jogo ele
     srand( (unsigned)time(NULL));
     
     if(nivel == 1) {/*Nivel 1 gera uma senha de 4 digitos de 1 a 6 sem repetição*/
-      for (i=0; i < 4; i++) {
+      for (i=0; i < 4; i++){
             pos = rand() % 5;
 
-        if(sorteados[pos] != 0) {
+        if(sorteados[pos] != 0){
             vetor.senha[i] = sorteados[pos];
             sorteados[pos] = 0;
         }
-
         else i--;
         }
     }
 
     else if(nivel == 2) {/*Nivel 2 gera uma senha de 4 digitos de 1 a 6 com repetição */
         for (i=0; i < 4; i++){
-            vetor.senha[i] = 1 + rand() % 6;
+            vetor.senha[i] = 1 + rand() % 5;
         }
     }
-    else if(nivel == 3) {/*Nivel 3 gera uma senha de 6 digitos com repetição*/
-        vetor.senha = (int *) realloc(vetor.senha, 6 * sizeof(int));
-        for (i=0; i < 6; i++){
+    else if(nivel == 3) {/*Nivel 3 gera uma senha de 4 digitos com repetição*/
+        /*vetor.senha = (int *) realloc(vetor.senha, 6 * sizeof(int));*/
+        for (i=0; i < 4; i++){
             vetor.senha[i] = 1 + rand() % 7;
         }
     }
@@ -150,20 +150,23 @@ void calcula_acertos(VETORES vetor, int tamanho){
         if(vetor_tentativa_int[i] == vetor.senha[i]) {
             vetor.bolas_branca_e_preta[contador] = 'X';
             aux[i] = 0; /*Substitui o valor analisado para um 0*/
+            vetor_tentativa_int[i] = 0;
             contador++; /*Altera o contador para a legenda não sobrescrever uma posição já preenchida*/
         }
     }
-
     /***Verifica quais números da tentativa restante estão corretos mas na posição errada***/
-    for (i = 0; i < tamanho; i++) {  
-            for ( j = 0; j < tamanho; j++) {
-                if((vetor.bolas_branca_e_preta[i]!='X' && vetor.bolas_branca_e_preta[j]!='X') && vetor_tentativa_int[i] == aux[j]) { 
-                    vetor.bolas_branca_e_preta[contador] = 'O'; 
-                    contador++; /*Altera o contador para a legenda não sobrescrever uma posição já preenchida*/
-                    aux[j] = 0; /*Substitui o valor analisado para um 0*/
-                }
+    for (i = 0; i < tamanho; i++){  
+        for ( j = 0; j < tamanho; j++){
+            if(vetor_tentativa_int[i] == aux[j] && vetor_tentativa_int[i] != 0){ /*Verifica se o algarismo da tentativa está em algum lugar da senha*/
+                vetor.bolas_branca_e_preta[contador] = 'O'; /*Se estiver, acrescenta um 'O'*/
+                contador++; /*Altera o contador para a legenda não sobrescrever uma posição já preenchida*/
+                aux[j] = 0; /*Substitui o valor analisado da senha para um 0*/
+                break; /*Para de procurar em senha porque já achou*/
             }
+        }
     }
+free(vetor_tentativa_int);
+free(aux);
 }
 
 int compara_tentativa_senha(VETORES vetor, int tamanho){

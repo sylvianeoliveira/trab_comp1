@@ -1,6 +1,8 @@
 #ifndef FUNCOES_H
-#define FUNCOES_H 
+#define FUNCOES_H
+#include <locale.h>
 #include "estruturas.h"
+
 void limpa_string(char string[]); /*Retira o \n da string*/
 void limpa_ponteiros(VETORES vetor);
 
