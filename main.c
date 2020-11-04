@@ -3,16 +3,15 @@
 #include <stdlib.h>
 #include "funcoes.h"
 
+#define TAMANHO_SENHA 4
+
 int main(void){
     FILE *arquivo, *arquivo2;
     VETORES vetor;
-    char c;
-    int resposta, vidas, tamanho, intervalo, jogar_novamente, acesso_regras;
-    char nickname[33];
-    int teste_de_nome;  /*Para nao causar problemas com o retorno*/
-    char nivel_do_jogo;
+    char c, nickname[33], nivel_do_jogo;
+    int acesso_regras, intervalo, jogar_novamente, resposta, teste_de_nome, vidas; 
 
-    acesso_caractere_especial();
+    acesso_caractere_especial(); /*Permite os caracteres especiais*/
 
     printf("Seja muito bem vindo ao Mastermind\n\n"); /*Mensagem de Boas-Vindas*/
 
@@ -24,21 +23,21 @@ int main(void){
         limpa_string(nickname);
         teste_de_nome = valida_nome(nickname);
 
-        if (teste_de_nome == 1){
+        if (teste_de_nome == 1){ /*Verifica a validação*/
             printf("Nome aceito com sucesso.\n\n");
             break;
         }
         printf("Nome inválido\n");
     }
-    easteregg(nickname);
+    easteregg(nickname); /*Trata e verifica o caso do easteregg*/
     
     printf("%s, chegou a hora de treinar suas habilidades em quebrar códigos.\n", nickname); /*Saudação para iniciar o jogo*/
     
     while(1){ /*O jogo em loop até o usuário desejar sair*/
         /***Alocação de memória para os vetores abaixo***/
-        vetor.bolas_branca_e_preta = (char *) malloc(4 * sizeof(char));
-        vetor.tentativa = (char *) malloc(4*sizeof(char));
-        vetor.senha = (int *) malloc(4*sizeof(int));
+        vetor.bolas_branca_e_preta = (char *) malloc(TAMANHO_SENHA * sizeof(char));
+        vetor.tentativa = (char *) malloc(TAMANHO_SENHA * sizeof(char));
+        vetor.senha = (int *) malloc(TAMANHO_SENHA * sizeof(int));
 
         /***Decisão para ler ou não as regras***/
         printf("\nDeseja acessar o codigo de regras? (Digite 1 para sim, 0 para não)\n");
@@ -83,7 +82,6 @@ int main(void){
         /***Switch para determinar as condições de cada nível***/
         switch (nivel_do_jogo){
         case 1:
-            tamanho = 4; /*Tamanho da senha*/
             vidas = 8; /*Quantidade de tentativas possíveis*/
             intervalo = 6; /*Opções de digitos: 1 a 6*/
             printf("No nível fácil, a senha e a tentativa só podem conter números de 1 a %d.\n\n", intervalo);
@@ -91,7 +89,6 @@ int main(void){
             break;
 
         case 2:
-            tamanho = 4; /*Tamanho da senha*/
             vidas = 10; /*Quantidade de tentativas possíveis*/
             intervalo = 6; /*Opções de digitos: 1 a 6*/
             printf("No nível intermediário, a senha e a tentativa só podem conter números de 1 a %d.\n\n", intervalo);
@@ -99,23 +96,20 @@ int main(void){
             break;
 
         case 3:
-            tamanho = 4; /*Tamanho da senha*/
             vidas = 15; /*Quantidade de tentativas possíveis*/
             intervalo = 8; /*Opções de digitos: 1 a 8*/
             printf("No nível difícil, a senha e a tentativa só podem conter números de 1 a %d.\n\n", intervalo);
             printf("Senha difícil gerada com sucesso.\n");
-
-            /*vetor_bolas_branca_e_preta = (char *) realloc(vetor_bolas_branca_e_preta, 6 * sizeof(char));
-            vetor_tentativa = (int *) realloc(vetor_tentativa, 6 * sizeof(int)); */
             break;
+
         case 42:
-            tamanho = 4; /*Tamanho da senha*/
             vidas = 10; /*Quantidade de tentativas possíveis*/
             intervalo = 9; /*Opções de digitos: 1 a 9*/
             printf("No modo desafio, a senha e a tentativa podem conter números de 1 a %d.\n\n", intervalo);
             printf("Senha desafio gerada com sucesso.\n");
             printf("Boa sorte %s, vai precisar.\n", nickname); /*Mensagem para usuários*/
             break; 
+
         default:
             break;
         }
@@ -135,11 +129,11 @@ int main(void){
                 fgets(vetor.tentativa, 32, stdin); /*Lê a tentativa*/
                 limpa_buffer();
                 limpa_string(vetor.tentativa); /*Limpa o \n do vetor tentativa*/
-                resposta = valida_tentativa(vetor, intervalo, tamanho); /*Função que valida a senha e retorna 1 ou 0*/
+                resposta = valida_tentativa(vetor, intervalo); /*Função que valida a senha e retorna 1 ou 0*/
                 if (resposta == 1) break; /*Interrompe o while quando a tentativa é válida*/
             }
             
-            calcula_acertos(vetor, tamanho); /*Função que retorna o vetor_bolas_branca_e_preta com a legenda de acertos*/
+            calcula_acertos(vetor); /*Função que retorna o vetor_bolas_branca_e_preta com a legenda de acertos*/
 
             arquivo = fopen("tela.txt", "a"); /*Escreve a nova linha*/
             if (arquivo == NULL) exit(1);
@@ -159,11 +153,11 @@ int main(void){
             }
             fclose(arquivo);
 
-            if (compara_tentativa_senha(vetor, tamanho) == 1){ /*Imprime a mensagem de vitória e encerra a atribuição de tentativas*/
+            if (compara_tentativa_senha(vetor) == 1){ /*Imprime a mensagem de vitória e encerra a atribuição de tentativas*/
                 printf("Parabéns! Você venceu o jogo!\n");
                 break;
             }
-            else if ((compara_tentativa_senha(vetor, tamanho) == 0) && (vidas == 1)){ /*Imprime a mensagem de derrota quando acabam as
+            else if ((compara_tentativa_senha(vetor) == 0) && (vidas == 1)){ /*Imprime a mensagem de derrota quando acabam as
                                                                                            tentativas e o usuário não acertou a senha*/
                 printf("Derrota! Você perdeu o jogo!\n");
                 /**Informa qual era a senha ao usuário que perdeu**/
@@ -178,7 +172,7 @@ int main(void){
         free(vetor.tentativa);
 
         printf("\n%s, você deseja jogar novamente? (Digite 1 para sim, 0 para não)\n", nickname); /*Pergunta se o usuário deseja jogar novamente*/
-        jogar_novamente = valida_acesso_regras();
+        jogar_novamente = valida_acesso_regras(); /*Valida o acesso as regras*/
         if (jogar_novamente == 0) exit(0); /*Se o usuário não desejar, o programa encerra*/
     }
     
