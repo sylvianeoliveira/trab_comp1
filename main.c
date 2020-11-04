@@ -5,6 +5,7 @@
 
 #define TAMANHO_SENHA 4
 
+
 int main(void){
     FILE *arquivo, *arquivo2;
     VETORES vetor;

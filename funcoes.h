@@ -3,6 +3,7 @@
 #include <locale.h>
 #include "estruturas.h"
 
+
 void acesso_caractere_especial(void); /*Permite imprimir caracteres especiais na tela*/
 void limpa_buffer(void); /*Limpa o buffer em diferentes sistemas operacionais*/
 
