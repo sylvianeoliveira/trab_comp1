@@ -6,6 +6,8 @@
 #include "estruturas.h"
 #include "funcoes.h"
 
+#define TAMANHO_SENHA 4
+
 void acesso_caractere_especial(void){
     #if defined(linux) || defined(unix) || defined(APPLE)
         setlocale(LC_ALL, "Portuguese");
@@ -26,12 +28,13 @@ void limpa_buffer(void){
     #endif
 }
 
+
 void limpa_string(char string[]) {
     int tam = strlen(string);
     int i;
     
     for(i = 0; i < tam; i++) { 
-        if(string[i]=='\n') {
+        if(string[i]=='\n') { /*Se for \n, substitui por \0*/
             string[i] = '\0';
         }
     }
@@ -41,6 +44,7 @@ void limpa_ponteiros(VETORES vetor) {
     vetor.tentativa[0] = '\0';
     vetor.bolas_branca_e_preta = '\0';
 }
+
 
 int valida_nome(char nickname[]) {
     int i,tam;
@@ -67,14 +71,14 @@ int valida_acesso_regras(void) {
         limpa_buffer();
         limpa_string(regras);
         if (strlen(regras) == 1){
-            if (regras[0] != '0' && regras[0] != '1'){
+            if (regras[0] != '0' && regras[0] != '1'){ /*Imprime comando invválido nas tentativas inválidas*/
                 printf("Comando inválido.\n");
             }
             else{
                 break;
             }
         }
-        else{
+        else{ /*Imprime comando invválido nas tentativas inválidas*/
             printf("Comando inválido.\n");
         }
     }
@@ -88,24 +92,24 @@ int valida_nivel(void){
         fgets(nivel, 32, stdin);
         limpa_buffer();
         limpa_string(nivel);
-        if ((strlen(nivel) == 1) && (nivel[0] >= 49 && nivel[0] <= 51)) break;
+        if ((strlen(nivel) == 1) && (nivel[0] >= 49 && nivel[0] <= 51)) break; /*Para para retornar o nível 1, 2 ou 3*/
 
-        else if((strlen(nivel) == 2) && (nivel[0] == '4' && nivel[1] == '2')) return 42;
+        else if((strlen(nivel) == 2) && (nivel[0] == '4' && nivel[1] == '2')) return 42; /*Retorna o nível do easteregg*/
 
         else printf("Nível inválido\n");
     }
     return nivel[0] - '0';
 }
 
-int valida_tentativa (VETORES vetor, int intervalo, int tamanho){
+int valida_tentativa (VETORES vetor, int intervalo){
     int i;
     char intervalo_char = intervalo + '0';
-    if (strlen(vetor.tentativa) == tamanho){
-        for(i=0; i < tamanho; i++){
-            if (vetor.tentativa[i] >= 49 && vetor.tentativa[i] <= intervalo_char){
+    if (strlen(vetor.tentativa) == TAMANHO_SENHA){
+        for(i=0; i < TAMANHO_SENHA; i++){
+            if (vetor.tentativa[i] >= 49 && vetor.tentativa[i] <= intervalo_char){ /*Continua se a tentativa estiver válida até o momento*/
                 continue;
             }
-            else{
+            else{ /*Retorna 0 quando a tentativa não é valida*/
                 return 0;
             }
         }
@@ -149,13 +153,13 @@ void easteregg(char nickname[]){
     if (validador == 1) printf("Professora??? :o\n\n");  
 }
 
-void gerador_senha(VETORES vetor,int nivel) {/*De acordo com o nivel do jogo ele gera uma senha diferente*/
+void gerador_senha(VETORES vetor,int nivel) {
     int i,pos;
     int sorteados[6]={1,2,3,4,5,6};
     srand( (unsigned)time(NULL));
     
     if(nivel == 1) {/*Nivel 1 gera uma senha de 4 digitos de 1 a 6 sem repetição*/
-      for (i=0; i < 4; i++){
+      for (i=0; i < TAMANHO_SENHA; i++){
             pos = rand() % 5;
 
         if(sorteados[pos] != 0){
@@ -167,42 +171,43 @@ void gerador_senha(VETORES vetor,int nivel) {/*De acordo com o nivel do jogo ele
     }
 
     else if(nivel == 2) {/*Nivel 2 gera uma senha de 4 digitos de 1 a 6 com repetição */
-        for (i=0; i < 4; i++){
+        for (i=0; i < TAMANHO_SENHA; i++){
             vetor.senha[i] = 1 + rand() % 5;
         }
     }
+
     else if(nivel == 3) {/*Nivel 3 gera uma senha de 4 digitos de 1 a 8 com repetição*/
-        /*vetor.senha = (int *) realloc(vetor.senha, 6 * sizeof(int));*/
-        for (i=0; i < 4; i++){
+        for (i=0; i < TAMANHO_SENHA; i++){
             vetor.senha[i] = 1 + rand() % 7;
         }
     }
+
     else if(nivel == 42){ /*Modo desafio gera uma senha de 4 dígitos de 1 a 9 com repetição*/
-        for (i=0; i < 4; i++){
+        for (i=0; i < TAMANHO_SENHA; i++){
             vetor.senha[i] = 1 + rand() % 8;
         }
     }
 }
 
-void calcula_acertos(VETORES vetor, int tamanho){
+void calcula_acertos(VETORES vetor){
     int i, j, contador = 0;
     int *vetor_tentativa_int, *aux;
 
-    vetor_tentativa_int = (int *)malloc(tamanho * sizeof(int)); /*Aloca memória para o vetor inteiro de tentativa*/
-    aux = (int *)malloc(tamanho * sizeof(int)); /*Aloca memória para o vetor auxliar*/
+    vetor_tentativa_int = (int *)malloc(TAMANHO_SENHA * sizeof(int)); /*Aloca memória para o vetor inteiro de tentativa*/
+    aux = (int *)malloc(TAMANHO_SENHA * sizeof(int)); /*Aloca memória para o vetor auxliar*/
 
     /***Inicia o vetor de bolas com traços '-'***/
-    for (i = 0; i < tamanho; i++){
+    for (i = 0; i < TAMANHO_SENHA; i++){
         vetor.bolas_branca_e_preta[i] = '-';
     }
 
     /***Copia a senha para um vetor auxiliar***/
-    for (i = 0; i < tamanho; i++) {
+    for (i = 0; i < TAMANHO_SENHA; i++) {
         aux[i] = vetor.senha[i];
     }
 
    /***Verifica quais números da tentativa estão corretos e na posicao certa 'X'***/
-    for (i = 0; i < tamanho; i++){
+    for (i = 0; i < TAMANHO_SENHA; i++){
         vetor_tentativa_int[i] = vetor.tentativa[i] - '0'; /*Converte de char para inteiro*/
 
         if(vetor_tentativa_int[i] == vetor.senha[i]) {
@@ -213,8 +218,8 @@ void calcula_acertos(VETORES vetor, int tamanho){
         }
     }
     /***Verifica quais números da tentativa restante estão corretos mas na posição errada***/
-    for (i = 0; i < tamanho; i++){  
-        for ( j = 0; j < tamanho; j++){
+    for (i = 0; i < TAMANHO_SENHA; i++){  
+        for ( j = 0; j < TAMANHO_SENHA; j++){
             if(vetor_tentativa_int[i] == aux[j] && vetor_tentativa_int[i] != 0){ /*Verifica se o algarismo da tentativa está em algum lugar da senha*/
                 vetor.bolas_branca_e_preta[contador] = 'O'; /*Se estiver, acrescenta um 'O'*/
                 contador++; /*Altera o contador para a legenda não sobrescrever uma posição já preenchida*/
@@ -223,16 +228,16 @@ void calcula_acertos(VETORES vetor, int tamanho){
             }
         }
     }
-free(vetor_tentativa_int);
-free(aux);
+    free(vetor_tentativa_int);
+    free(aux);
 }
 
-int compara_tentativa_senha(VETORES vetor, int tamanho){
+int compara_tentativa_senha(VETORES vetor){
     int i, *vetor_tentativa_int;
 
-    vetor_tentativa_int = (int *) malloc(tamanho * sizeof(int)); /*Aloca memória para o vetor inteiro de tentativa*/
+    vetor_tentativa_int = (int *) malloc(TAMANHO_SENHA * sizeof(int)); /*Aloca memória para o vetor inteiro de tentativa*/
 
-    for(i=0; i < tamanho; i++){
+    for(i=0; i < TAMANHO_SENHA; i++){
         vetor_tentativa_int[i] = vetor.tentativa[i] - '0'; /*Converte de char para inteiro*/
         if (vetor_tentativa_int[i] == vetor.senha[i]) continue;
         else{
@@ -241,7 +246,3 @@ int compara_tentativa_senha(VETORES vetor, int tamanho){
     }
     return 1; /*Retorna 1, pois a senha e a tentativa são iguais*/
 }
-
-
-
-
