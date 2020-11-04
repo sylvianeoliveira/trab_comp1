@@ -8,7 +8,6 @@
 
 #define TAMANHO_SENHA 4
 
-
 void acesso_caractere_especial(void){
     #if defined(linux) || defined(unix) || defined(APPLE)
         setlocale(LC_ALL, "Portuguese");

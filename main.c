@@ -5,7 +5,6 @@
 
 #define TAMANHO_SENHA 4
 
-
 int main(void){
     FILE *arquivo, *arquivo2;
     VETORES vetor;
@@ -116,8 +115,6 @@ int main(void){
         }
 
         gerador_senha(vetor, nivel_do_jogo); /*Função que gera uma senha aleatória de acordo com o nível escolhido*/
-
-        /*printf("%d %d %d %d\n", vetor.senha[0], vetor.senha[1], vetor.senha[2], vetor.senha[3]); Tirar no final*/
 
         arquivo = fopen("tela.txt", "w"); /*Limpa a tela antes de começar*/
         fclose(arquivo);
